@@ -1,0 +1,20 @@
+import pygame
+import random
+import math
+from collections import deque
+
+
+WIDTH = 600
+HEIGHT = 400
+BLOCK_SIZE = 20
+WHITE = (255, 255, 255)
+GREEN = (0, 200, 0)
+RED = (200, 0, 0)
+BLACK = (0, 0, 0)
+
+
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snake Game using DSA")
+clock = pygame.time.Clock()
+font = pygame.font.SysFont(None, 35)
