@@ -1,0 +1,42 @@
+#snake.py
+from collections import deque
+from day1_constants import BLOCK_SIZE, WIDTH, HEIGHT
+
+
+snake = deque()
+snake.append((WIDTH // 2, HEIGHT // 2))
+snake_body_set = set(snake)
+
+
+dx = 0
+dy = 0
+direction = 'STOP'
+
+
+score = 0
+
+
+
+
+def update_snake():
+global snake, snake_body_set, dx, dy, direction
+if direction != 'STOP':
+head_x, head_y = snake[0]
+new_head = (head_x + dx, head_y + dy)
+if new_head[0] < 0 or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= HEIGHT:
+return 'WALL'
+if new_head in snake_body_set:
+return 'SELF'
+snake.appendleft(new_head)
+snake_body_set.add(new_head)
+return 'MOVED'
+return 'NONE'
+
+
+
+
+def remove_tail():
+global snake, snake_body_set
+tail = snake.pop()
+snake_body_set.remove(tail)
+return tail
