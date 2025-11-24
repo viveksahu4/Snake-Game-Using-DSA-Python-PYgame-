@@ -1,0 +1,36 @@
+import random
+import math
+from day1_constants import WIDTH, HEIGHT, BLOCK_SIZE
+
+
+apple_positions = []
+path_distance = 0
+
+
+food = (random.randrange(0, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
+random.randrange(0, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE)
+
+
+
+
+def spawn_food():
+global food
+food = (random.randrange(0, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
+random.randrange(0, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE)
+return food
+
+
+
+
+def handle_eat(new_head):
+global food, apple_positions, path_distance
+if new_head == food:
+apple_positions.append(food)
+if len(apple_positions) > 1:
+x1, y1 = apple_positions[-2]
+x2, y2 = apple_positions[-1]
+dist = round(math.hypot(x2 - x1, y2 - y1), 2)
+path_distance += dist
+spawn_food()
+return True
+return False
