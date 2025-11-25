@@ -1,0 +1,43 @@
+import pygame
+import matplotlib.pyplot as plt
+import math
+from day1_constants import screen, BLOCK_SIZE, GREEN, RED, WHITE, BLACK, WIDTH, HEIGHT, font
+from day2_snake import snake
+from day3_food import food, apple_positions, path_distance
+
+
+
+
+def draw_snake_and_food():
+screen.fill(BLACK)
+for x, y in snake:
+pygame.draw.rect(screen, GREEN, (x, y, BLOCK_SIZE, BLOCK_SIZE))
+pygame.draw.rect(screen, RED, (food[0], food[1], BLOCK_SIZE, BLOCK_SIZE))
+score_text = font.render(f"Score: {len(apple_positions)}", True, WHITE)
+screen.blit(score_text, (10, 10))
+pygame.display.update()
+
+
+
+
+def plot_graph(score):
+if len(apple_positions) > 1:
+plt.figure(figsize=(10, 7))
+plt.title(f"Path between apples | Score: {score} | Distance: {round(path_distance, 2)}", fontsize=14)
+plt.axis('equal')
+for i, (x, y) in enumerate(apple_positions):
+plt.plot(x, y, 'bo', markersize=10)
+plt.text(x, y, str(i + 1), color='white', ha='center', va='center', fontsize=8,
+bbox=dict(facecolor='blue', edgecolor='none'))
+if i > 0:
+x_prev, y_prev = apple_positions[i - 1]
+plt.plot([x_prev, x], [y_prev, y])
+mid_x = (x_prev + x) / 2
+mid_y = (y_prev + y) / 2
+dist = round(math.hypot(x - x_prev, y - y_prev), 2)
+plt.text(mid_x, mid_y, str(dist), color='black', fontsize=8)
+plt.gca().invert_yaxis()
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.grid(True)
+plt.show()
