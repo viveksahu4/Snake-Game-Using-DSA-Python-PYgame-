@@ -1,0 +1,41 @@
+import pygame
+from day1_constants import *
+from day2_snake import *
+from day3_food import *
+from day4_draw import *
+
+
+running = True
+while running:
+for event in pygame.event.get():
+if event.type == pygame.QUIT:
+running = False
+elif event.type == pygame.KEYDOWN:
+if event.key == pygame.K_UP and direction != 'DOWN':
+dx, dy = 0, -BLOCK_SIZE
+direction = 'UP'
+elif event.key == pygame.K_DOWN and direction != 'UP':
+dx, dy = 0, BLOCK_SIZE
+direction = 'DOWN'
+elif event.key == pygame.K_LEFT and direction != 'RIGHT':
+dx, dy = -BLOCK_SIZE, 0
+direction = 'LEFT'
+elif event.key == pygame.K_RIGHT and direction != 'LEFT':
+dx, dy = BLOCK_SIZE, 0
+direction = 'RIGHT'
+result = update_snake()
+if result == 'WALL' or result == 'SELF':
+running = False
+break
+if result == 'MOVED':
+head = snake[0]
+eaten = handle_eat(head)
+if not eaten:
+remove_tail()
+draw_snake_and_food()
+clock.tick(10)
+pygame.quit()
+final_score = len(apple_positions)
+print("Final Score:", final_score)
+print("Total Path Distance Between Apples:", round(path_distance, 2))
+plot_graph(final_score)
