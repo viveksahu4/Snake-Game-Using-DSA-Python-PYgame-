@@ -1,0 +1,140 @@
+import pygame
+import random
+from collections import deque
+import math
+import matplotlib.pyplot as plt
+
+pygame.init()
+print("Starting game...")  # debug: shows script started in terminal
+
+WIDTH, HEIGHT = 600, 400
+BLOCK_SIZE = 20
+
+WHITE = (255, 255, 255)
+GREEN = (0, 200, 0)
+RED = (200, 0, 0)
+BLACK = (0, 0, 0)
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snake Game using DSA")
+
+snake = deque()
+snake.append((WIDTH // 2, HEIGHT // 2))
+
+dx, dy = BLOCK_SIZE, 0
+direction = 'RIGHT'
+
+food = (
+    random.randrange(0, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
+    random.randrange(0, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE
+)
+
+snake_body_set = set(snake)
+clock = pygame.time.Clock()
+
+score = 0
+apple_positions = []
+path_distance = 0
+
+running = True
+while running:
+    screen.fill(BLACK)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and direction != 'DOWN':
+                dx, dy = 0, -BLOCK_SIZE
+                direction = 'UP'
+            elif event.key == pygame.K_DOWN and direction != 'UP':
+                dx, dy = 0, BLOCK_SIZE
+                direction = 'DOWN'
+            elif event.key == pygame.K_LEFT and direction != 'RIGHT':
+                dx, dy = -BLOCK_SIZE, 0
+                direction = 'LEFT'
+            elif event.key == pygame.K_RIGHT and direction != 'LEFT':
+                dx, dy = BLOCK_SIZE, 0
+                direction = 'RIGHT'
+
+    if direction != 'STOP':
+        head_x, head_y = snake[0]
+        new_head = (head_x + dx, head_y + dy)
+
+        if new_head[0] < 0 or new_head[0] >= WIDTH or new_head[1] < 0 or new_head[1] >= HEIGHT:
+            print("Game Over! You hit the wall.")
+            running = False
+            continue
+
+        if new_head in snake_body_set:
+            print("Game Over! You hit yourself.")
+            running = False
+            continue
+
+        snake.appendleft(new_head)
+        snake_body_set.add(new_head)
+
+        if new_head == food:
+            score += 1
+            apple_positions.append(food)
+
+            if len(apple_positions) > 1:
+                x1, y1 = apple_positions[-2]
+                x2, y2 = apple_positions[-1]
+                dist = round(math.hypot(x2 - x1, y2 - y1), 2)
+                path_distance += dist
+
+            food = (
+                random.randrange(0, WIDTH // BLOCK_SIZE) * BLOCK_SIZE,
+                random.randrange(0, HEIGHT // BLOCK_SIZE) * BLOCK_SIZE
+            )
+        else:
+            tail = snake.pop()
+            snake_body_set.remove(tail)
+
+    for x, y in snake:
+        pygame.draw.rect(screen, GREEN, (x, y, BLOCK_SIZE, BLOCK_SIZE))
+
+    pygame.draw.rect(screen, RED, (food[0], food[1], BLOCK_SIZE, BLOCK_SIZE))
+
+    font = pygame.font.SysFont(None, 35)
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (10, 10))
+
+    pygame.display.update()
+    clock.tick(10)
+
+pygame.quit()
+
+print("Final Score:", score)
+print("Total Path Distance Between Apples:", round(path_distance, 2))
+
+if len(apple_positions) > 1:
+    plt.figure(figsize=(10, 7))
+    plt.title(
+        f"Path between apples | Score: {score} | Distance: {round(path_distance, 2)}",
+        fontsize=14
+    )
+    plt.axis('equal')
+
+    for i, (x, y) in enumerate(apple_positions):
+        plt.plot(x, y, 'bo', markersize=10)
+        plt.text(
+            x, y, str(i + 1),
+            color='white', ha='center', va='center', fontsize=8,
+            bbox=dict(facecolor='blue', edgecolor='none')
+        )
+
+        if i > 0:
+            x_prev, y_prev = apple_positions[i - 1]
+            plt.plot([x_prev, x], [y_prev, y])
+            mid_x = (x_prev + x) / 2
+            mid_y = (y_prev + y) / 2
+            dist = round(math.hypot(x - x_prev, y - y_prev), 2)
+            plt.text(mid_x, mid_y, str(dist), color='black', fontsize=8)
+
+    plt.gca().invert_yaxis()
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid(True)
+    plt.show()
